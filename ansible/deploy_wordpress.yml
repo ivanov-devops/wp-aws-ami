@@ -11,8 +11,8 @@
     - vars/wordpress_vars.yml
     - vars/mysql_vars.yml
 
-  roles:
-    - wordpress
+#  roles:
+#    - wordpress
 
   tasks:
     - name: Download wp-cli
@@ -24,36 +24,76 @@
     - name: Install WordPress using wp-cli
       command: /usr/local/bin/wp core install --path="/var/www/html/{{ http_host }}/wordpress" --url="{{ http_host }}" --title="My WordPress Site" --admin_user="admin" --admin_password="{{ http_pass }}" --admin_email="admin@example.com" --allow-root
 
-    - name: Copy custom-content.php to the remote server
+    - name: Copy custom-content.j2 to the remote server
       copy:
-        src: templates/custom-content.php
+        src: templates/custom-content.j2
         dest: /tmp/custom-content.php
         mode: '0644'
 
-    - name: Create the custom page as a draft
-      command: /usr/local/bin/wp post create --post_type=page --post_title="Linux namespaces" --post_status=draft --post_content="$(cat /tmp/custom-content.php)"
-      args:
-        chdir: "/var/www/html/{{ http_host }}/wordpress"
-      register: custom_page_create_result
+    - name: Read the custom content file
+      slurp:
+        path: /tmp/custom-content.php
+      register: custom_content_file
       changed_when: false
 
+    - name: Set the fetched content as the variable
+      set_fact:
+        custom_content: "{{ custom_content_file['content'] | b64decode }}"
+      changed_when: false
+
+    - name: Create the custom page as a draft
+      shell: echo "{{ custom_content }}" | /usr/local/bin/wp post create --post_type=page --post_title="Linux namespaces" --post_status=draft --post_content="{{ custom_content }}"
+      args:
+        chdir: "/var/www/html/{{ http_host }}/wordpress" # Define the correct path to your WordPress installation
+      register: create_page_result
+      changed_when: false
+
+
+    - name: Debug create_page_result
+      debug:
+        var: create_page_result
+
+
+
     - name: Set the custom page as the front page
-      command: /usr/local/bin/wp option update show_on_front "page"
+      command: /usr/local/bin/wp option get show_on_front
       args:
         chdir: "/var/www/html/{{ http_host }}/wordpress"
-      register: set_front_page_result
-      changed_when: "'already' not in set_front_page_result.stdout"
+      register: show_on_front_result
+      changed_when: false
 
     - name: Get the custom page ID
-      set_fact:
-        custom_page_id: "{{ custom_page_create_result.stdout_lines[-1] | regex_findall('\\d+') | first }}"
-      when: custom_page_create_result.stdout_lines | length > 0
-
-    - name: Update the status of the custom page to publish
-      command: /usr/local/bin/wp post update "{{ custom_page_id }}" --post_status=publish
+      command: /usr/local/bin/wp post list --post_type=page --post_status=draft --field=ID --format=ids
       args:
         chdir: "/var/www/html/{{ http_host }}/wordpress"
-      when: custom_page_id is defined and custom_page_id != ""
+      register: custom_page_id_result
+      changed_when: false
+
+    - name: Debug custom_page_id
+      debug:
+        var: custom_page_id_result.stdout_lines
+      when: custom_page_id_result.stdout_lines | length > 0
+
+    - name: Update the status of the custom pages to publish
+      command: /usr/local/bin/wp post update "{{ item }}" --post_status=publish
+      args:
+        chdir: "/var/www/html/{{ http_host }}/wordpress"
+      loop: "{{ custom_page_id_result.stdout_lines[0].split() }}"
+      ignore_errors: yes
+      when: item not in show_on_front_result.stdout
+
+    - name: Set the custom page as the front page
+      command: /usr/local/bin/wp option update show_on_front page
+      args:
+        chdir: "/var/www/html/{{ http_host }}/wordpress"
+      changed_when: false
+
+    - name: Set the custom page ID as the page_on_front value
+      command: /usr/local/bin/wp option update page_on_front "{{ custom_page_id_result.stdout_lines[0] }}"
+      args:
+        chdir: "/var/www/html/{{ http_host }}/wordpress"
+      changed_when: false
+
 
     - name: Flush rewrite rules
       command: /usr/local/bin/wp rewrite flush
