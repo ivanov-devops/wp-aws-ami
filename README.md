@@ -30,7 +30,6 @@ pip3 install ansible
 ansible --version
 ```
 
-
 5. AWS Credentials: Configure your AWS credentials on your Linux machine by creating a shared credentials file. Open a terminal and run:
 
    ```
@@ -41,29 +40,44 @@ ansible --version
    echo "aws_access_key_id = YOUR_ACCESS_KEY" >> ~/.aws/credentials
    echo "aws_secret_access_key = YOUR_SECRET_KEY" >> ~/.aws/credentials
    ```
+6. Make: Make is a build automation tool that simplifies the process of building and compiling code. It is usually pre-installed on Unix-based systems like Linux and macOS. For Windows users, you can install Make through tools like Cygwin or WSL.
 
-5. Use Makefile
+Installation:
+   For Linux (Ubuntu/Debian): sudo apt-get install make
+   For macOS (Homebrew): brew install make
 
-With the Makefile and README.md in place, developers using Linux can easily understand the purpose of the repository, its prerequisites, and how to use the provided make targets to create and destroy the WordPress infrastructure. The README.md file also provides instructions on how to set up the required dependencies and where to place the WordPress files for the Ansible playbook to use.
+jq: jq is a lightweight and flexible command-line JSON processor. It is used to parse, filter, and manipulate JSON data in the terminal.
 
-6.  MIT License
+Installation:
+   For Linux (Ubuntu/Debian): sudo apt-get install jq
+   For macOS (Homebrew): brew install jq
+   For Windows: Download the binary from the official jq website (https://stedolan.github.io/jq/download/)
+
+
+#### USAGE
+
+With the Makefile and terraform can be provisioned the archtecture of:
+- VPC
+- subnets
+- route Tables
+- ALB
+- EFS
+- database ec2 instance
+- 2 ec2 wordpress instances
+
+Ansible is used to:
+- attach the EFS, update the nodes, deploy mysql in database ec2
+- deploy Apache and wordpress
+- install the wp
+- add custom page to the current default theme via wp cli
+
+or just run
+`make provision`
+
+7.  MIT License
 
 Copyright (c) 2023 Dimitar
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+License
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+This project is licensed under the MIT License. Feel free to use, modify, and distribute the code following the terms of the license.
