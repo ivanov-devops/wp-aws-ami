@@ -1,0 +1,30 @@
+# macOS hidden files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Terraform files and directories
+terraform/terraform/.terraform
+terraform/.terraform/.terraform.lock.hcl
+**/.terraform/*
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/crash.log
+terraform/crash.*.log
+terraform/*.tfvars
+terraform/*.tfvars.json
+terraform/override.tf
+terraform/override.tf.json
+terraform/*_override.tf
+*_override.tf.json
+terraform/.terraformrc
+terraform/terraform.rc
+
+# Custom files
+ansible/inventory.json
+ansible/ansible_inventory.ini

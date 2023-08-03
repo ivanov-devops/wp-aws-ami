@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Optimize WordPress Database Tables
+
+# Database Credentials
+db_name="{{ wordpress_db_name }}"
+db_user="{{ wordpress_db_user }}"
+db_password="{{ wordpress_db_password }}"
+
+# Log file for recording table size before and after optimization
+log_file="/var/log/optimize_tables.log"
+
+echo "-----------------------------------------------" >> $log_file
+echo "Timestamp: $(date)" >> $log_file
+
+# Record table size before optimization
+mysql -u $db_user -p$db_password -e "SELECT table_name, table_rows, data_length, index_length FROM information_schema.tables WHERE table_schema='$db_name';" >> $log_file
+
+# Optimize tables
+mysql -u $db_user -p$db_password -e "USE $db_name; SHOW TABLES;" | grep -v 'Tables_in' | while read table; do
+    echo "Optimizing table: $table" >> $log_file
+    mysql -u $db_user -p$db_password -e "OPTIMIZE TABLE $table;" >> $log_file
+done
+
+# Record table size after optimization
+mysql -u $db_user -p$db_password -e "SELECT table_name, table_rows, data_length, index_length FROM information_schema.tables WHERE table_schema='$db_name';" >> $log_file
+
+echo "Optimization completed successfully." >> $log_file
+echo "-----------------------------------------------" >> $log_file

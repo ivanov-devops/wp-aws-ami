@@ -1,0 +1,19 @@
+---
+- name: Deploy WordPress for WordPress
+  hosts: wordpress
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    wordpress_db_host: "{{ hostvars['database-instance']['ansible_host_private'] }}"
+  remote_user: ec2-user
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Create bash script from template
+      template:
+        src: install_php8.j2
+        dest: /home/ec2-user/install_php8.sh
+        mode: "0755"
+
+    - name: Execute the bash script
+      command: /home/ec2-user/install_php8.sh

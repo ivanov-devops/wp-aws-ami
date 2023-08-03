@@ -1,0 +1,91 @@
+---
+- name: Deploy MySQL for WordPress
+  hosts: database
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_host: "{{ ansible_host_public }}"
+  remote_user: ec2-user
+  become: true
+  gather_facts: true
+  vars_files:
+    - vars/mysql_vars.yml
+
+  tasks:
+    - name: Install pip for Python 3
+      yum:
+        name: python3-pip
+        state: present
+
+    - name: Install pymysql package
+      pip:
+        name: pymysql
+        executable: pip3
+        state: present
+
+    - name: Install the MySQL repo.
+      yum:
+        name: http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+        state: present
+
+    - name: Install MySQL packages
+      yum:
+        name: mysql-community-server
+        state: latest
+      become: true
+
+    - name: Start MySQL service
+      service:
+        name: mysqld
+        state: started
+        enabled: yes
+      become: true
+
+    - name: Copy my.cnf template
+      template:
+        src: my.cnf.j2
+        dest: /etc/my.cnf
+
+    - name: Start MySQL service
+      service:
+        name: mysqld
+        state: restarted
+        enabled: yes
+      become: true
+
+    - name: Create MySQL database for WP
+      community.mysql.mysql_db:
+        name: "{{ wordpress_db_name }}"
+        state: present
+        login_unix_socket: /var/lib/mysql/mysql.sock
+
+    - name: Create user with password, database privileges and 'WITH GRANT OPTION' in WP
+      community.mysql.mysql_user:
+        state: present
+        name: "{{ wordpress_db_user }}"
+        password: "{{ wordpress_db_password }}"
+        priv:
+          "'{{ wordpress_db_name }}': 'ALL,GRANT'"
+
+    - name: Allow remote login for the user
+      mysql_user:
+        name: "{{ wordpress_db_user }}"
+        host: "%"
+        password: "{{ wordpress_db_password }}"
+        priv: "{{ wordpress_db_name }}.*:ALL"
+        login_user: root
+        login_password: "{{ mysql_root_password }}"  # Replace with your MySQL root password
+      become: true
+
+    - name: Create optimize_tables.sh script
+      template:
+        src: optimize_tables.j2
+        dest: /opt/optimize_tables.sh
+        mode: "0755"
+
+    - name: Add cron job for table optimization
+      cron:
+        name: "Optimize WordPress Tables"
+        minute: "0"
+        hour: "3"
+        job: "/opt/optimize_tables.sh"

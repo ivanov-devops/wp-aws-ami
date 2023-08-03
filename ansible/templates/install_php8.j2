@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Update system packages
+sudo yum update -y
+
+# Install Amazon EFS utilities
+sudo yum install -y amazon-efs-utils
+
+# Install Amazon Linux extras
+sudo yum install -y amazon-linux-extras
+
+# Install EPEL repository
+sudo amazon-linux-extras install epel -y
+
+# Install PHP 8.0
+sudo amazon-linux-extras install php8.0 -y
+
+# Clean metadata
+sudo yum clean metadata -y

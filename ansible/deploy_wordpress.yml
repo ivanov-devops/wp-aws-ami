@@ -1,0 +1,54 @@
+---
+- name: Deploy WordPress for WordPress
+  hosts: wordpress-instance-1
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    wordpress_db_host: "{{ hostvars['database-instance']['ansible_host_private'] }}"
+  remote_user: ec2-user
+  become: true
+  gather_facts: false
+  vars_files:
+    - vars/wordpress_vars.yml
+    - vars/mysql_vars.yml
+
+  tasks:
+    - name: Download wp-cli
+      get_url:
+        url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+        dest: /usr/local/bin/wp
+        mode: '0755'
+
+    - name: Copy custom-content.php to the remote server
+      copy:
+        src: templates/custom-content.php
+        dest: /tmp/custom-content.php
+        mode: '0644'
+
+    - name: Create the custom page as a draft
+      command: /usr/local/bin/wp post create --post_type=page --post_title="Linux namespaces" --post_status=draft --post_content="$(cat /tmp/custom-content.php)"
+      args:
+        chdir: "/var/www/html/{{ http_host }}/wordpress"
+      register: custom_page_create_result
+      changed_when: false
+
+    - name: Set the custom page as the front page
+      command: /usr/local/bin/wp option update show_on_front "page"
+      args:
+        chdir: "/var/www/html/{{ http_host }}/wordpress"
+      ignore_errors: yes
+
+    - name: Get the custom page ID
+      set_fact:
+        custom_page_id: "{{ custom_page_create_result.stdout | regex_findall('\\d+') | first }}"
+      when: custom_page_create_result.stdout | regex_findall('\\d+') | length > 0
+
+    - name: Update the status of the custom page to publish
+      command: /usr/local/bin/wp post update "{{ custom_page_id }}" --post_status=publish
+      args:
+        chdir: "/var/www/html/{{ http_host }}/wordpress"
+      ignore_errors: yes
+
+    - name: Flush rewrite rules
+      command: /usr/local/bin/wp rewrite flush
+      args:
+        chdir: "/var/www/html/{{ http_host }}/wordpress"

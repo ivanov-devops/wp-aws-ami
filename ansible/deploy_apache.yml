@@ -1,0 +1,47 @@
+---
+- name: Deploy WordPress for WordPress
+  hosts: wordpress
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    wordpress_db_host: "{{ hostvars['database-instance']['ansible_host_private'] }}"
+  remote_user: ec2-user
+  become: true
+  gather_facts: false
+  vars_files:
+    - vars/wordpress_vars.yml
+    - vars/mysql_vars.yml
+    - vars/efs_dns_name.yml
+
+  pre_tasks:
+
+    - name: Install MySQL-python
+      yum:
+        name:
+          - python3-pip
+          - MySQL-python
+
+    - name: Make sure pymysql is present
+      pip:
+        name: pymysql
+        state: present
+
+    - name: Install amazon-efs-utils
+      yum:
+        name: amazon-efs-utils
+        state: present
+
+    - name: Create mount point directory
+      file:
+        path: /var/www/html
+        state: directory
+
+    - name: Mount EFS Volume
+      mount:
+        path: /var/www/html
+        src: "{{ efs_dns_name }}:/"
+        fstype: efs
+        opts: tls
+        state: mounted
+
+  roles:
+    - apache

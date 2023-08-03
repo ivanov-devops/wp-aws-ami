@@ -1,0 +1,51 @@
+# WordPress Configuration
+- name: Create http_host directory
+  file:
+    path: "/var/www/html/{{ http_host }}"
+    state: directory
+  become: yes
+
+- name: Download and unpack latest WordPress
+  unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: "/var/www/html/{{ http_host }}"
+    remote_src: yes
+    creates: "/var/www/html/{{ http_host }}/wordpress"
+  become: yes
+
+- name: Set ownership
+  file:
+    path: "/var/www/html/{{ http_host }}"
+    state: directory
+    recurse: yes
+    owner: apache
+    group: apache
+  become: yes
+
+- name: Set permissions for directories
+  shell: "/usr/bin/find /var/www/html/{{ http_host }}/wordpress/ -type d -exec chmod 750 {} \\;"
+  become: yes
+
+- name: Set permissions for files
+  shell: "/usr/bin/find /var/www/html/{{ http_host }}/wordpress/ -type f -exec chmod 640 {} \\;"
+  become: yes
+
+- name: Copy sample config file
+  command: mv /var/www/html/{{ http_host }}/wordpress/wp-config-sample.php /var/www/html/{{ http_host }}/wordpress/wp-config.php creates=/var/www/html/{{ http_host }}/wordpress/wp-config.php
+  become: yes
+
+- name: Update WordPress config file
+  lineinfile:
+    path: "/var/www/html/{{ http_host }}/wordpress/wp-config.php"
+    regexp: "{{item.regexp}}"
+    line: "{{item.line}}"
+  with_items:
+    - {'regexp': "define\\( 'DB_NAME', '(.)+' \\);", 'line': "define( 'DB_NAME', '{{wordpress_db_name}}' );"}
+    - {'regexp': "define\\( 'DB_USER', '(.)+' \\);", 'line': "define( 'DB_USER', '{{wordpress_db_user}}' );"}
+    - {'regexp': "define\\( 'DB_PASSWORD', '(.)+' \\);", 'line': "define( 'DB_PASSWORD', '{{wordpress_db_password}}' );"}
+    - {'regexp': "define\\( 'DB_HOST', '(.)+' \\);", 'line': "define( 'DB_HOST', '{{wordpress_db_host}}' );"}
+  become: yes
+
+- name: Restart httpd service
+  systemd: name=httpd state=restarted
+  become: yes

@@ -1,0 +1,19 @@
+- name: Deploy mysql
+  ansible.builtin.import_playbook: deploy_mysql.yml
+  tags:
+  - deploy_mysql
+
+- name: Deploy PHP
+  ansible.builtin.import_playbook: deploy_php.yml
+  tags:
+  - deploy_php
+
+- name: Deploy Apache
+  ansible.builtin.import_playbook: deploy_apache.yml
+  tags:
+  - deploy_apache
+
+- name: Deploy WordPress
+  ansible.builtin.import_playbook: deploy_wordpress.yml
+  tags:
+  - deploy_wordpress
