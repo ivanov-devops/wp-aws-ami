@@ -64,8 +64,8 @@
         state: present
         name: "{{ wordpress_db_user }}"
         password: "{{ wordpress_db_password }}"
-        priv:
-          "'{{ wordpress_db_name }}': 'ALL,GRANT'"
+        priv: "{{ wordpress_db_name }}.*:ALL,GRANT"
+      become: true
 
     - name: Allow remote login for the user
       mysql_user:
@@ -73,9 +73,10 @@
         host: "%"
         password: "{{ wordpress_db_password }}"
         priv: "{{ wordpress_db_name }}.*:ALL"
-        login_user: root
-        login_password: "{{ mysql_root_password }}"  # Replace with your MySQL root password
+        login_unix_socket: /var/lib/mysql/mysql.sock
       become: true
+
+
 
     - name: Create optimize_tables.sh script
       template:
