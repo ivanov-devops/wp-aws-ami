@@ -16,15 +16,8 @@ plan:
 	cd $(TF_DIR) && terraform plan
 
 apply:
-    @cd $(TF_DIR) && \
-    retries=0; \
-    while [ $$retries -lt $(MAX_RETRIES) ]; do \
-        terraform apply -auto-approve && exit 0; \
-        retries=$$(($$retries + 1)); \
-        echo "Retrying Terraform apply (Attempt $$retries of $(MAX_RETRIES))..."; \
-    done; \
-    echo "Terraform apply failed after $(MAX_RETRIES) attempts."; \
-    exit 1
+	cd $(TF_DIR) && terraform apply -auto-approve || (retries=0; while [ $$retries -lt $(MAX_RETRIES) ]; do terraform apply -auto-approve && exit 0 || retries=$$(($$retries + 1)); done; exit 1)
+
 
 
 destroy:
