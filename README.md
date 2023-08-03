@@ -13,7 +13,7 @@ Before running Terraform, ensure you have the following:
 3. Terraform: Install Terraform on your Linux machine. You can download the latest version from the official website [here](https://www.terraform.io/downloads.html) or use package managers like `apt` or `yum`.
 
 4. Ansible
-## Linux (Red Hat/CentOS)
+#### Linux (Red Hat/CentOS)
 
 On Red Hat-based systems like CentOS, you can use the following commands to install Ansible:
 
@@ -21,7 +21,7 @@ On Red Hat-based systems like CentOS, you can use the following commands to inst
 sudo yum install epel-release   # Install the EPEL repository (if not already installed)
 sudo yum install ansible
 ```
-## macOS
+#### macOS
 ```
 pip3 install ansible
 ```
