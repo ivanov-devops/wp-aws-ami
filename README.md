@@ -1,6 +1,6 @@
 # Terraform AWS Infrastructure
 
-This repository contains Terraform and Ansible code to set up a WordPress infrastructure on AWS.
+This repository is PoC and contains Terraform and Ansible code to set up a WordPress infrastructure on AWS with the website, custom front page and cron which makes OPTIMIZE for all tables in the database and record before and after the OPTIMIZE the size of the tables in log file.
 
 ## Prerequisites
 
@@ -56,24 +56,117 @@ Installation:
 
 #### USAGE
 
-With the Makefile and terraform can be provisioned the archtecture of:
-- VPC
-- subnets
-- route Tables
-- ALB
-- EFS
-- database ec2 instance
-- 2 ec2 wordpress instances
+Terraform will provision the resources.
 
 Ansible is used to:
 - attach the EFS, update the nodes, deploy mysql in database ec2
 - deploy Apache and wordpress
-- install the wp
+- install the wp and cron
 - add custom page to the current default theme via wp cli
 
-or just run
+update in `makefile` `AWS_PROFILE :=` with your aws AWS_PROFILE
+
+and just run
 `make provision`
 
+# Terraform Provisioned Resources
+
+## VPC
+
+### wordpress-vpc
+
+- CIDR Block: 10.0.0.0/16
+- Availability Zones: us-east-2a, us-east-2b
+- Public Subnets: [Subnet IDs]
+- Enable DNS Hostnames: true
+
+## EC2 Instances
+
+### wordpress-instance-1
+
+- AMI: [AMI ID]
+- Instance Type: t2.micro
+- Subnet: [Subnet ID]
+- Public IP: [Public IP Address]
+- Key Pair: wordpress-key
+
+### wordpress-instance-2
+
+- AMI: [AMI ID]
+- Instance Type: t2.micro
+- Subnet: [Subnet ID]
+- Public IP: [Public IP Address]
+- Key Pair: wordpress-key
+
+### database-instance
+
+- AMI: [AMI ID]
+- Instance Type: t2.micro
+- Subnet: [Subnet ID]
+- Public IP: [Public IP Address]
+- Key Pair: wordpress-key
+
+## Security Groups
+
+### Default Security Group
+
+- Allow Inbound: Port 22 (SSH) from 0.0.0.0/0
+- Allow Inbound: Port 80 (HTTP) from 0.0.0.0/0
+- Allow Outbound: All Traffic to 0.0.0.0/0
+
+### ALB Security Group
+
+- Allow Inbound: Port 80 (HTTP) from Default Security Group
+
+## Load Balancer
+
+### wordpress-alb
+
+- Subnets: [Subnet IDs]
+- Security Groups: [ALB Security Group ID]
+
+## Load Balancer Target Group
+
+### wordpress-target-group
+
+- Protocol: HTTP
+- Health Check: Path: /, Port: traffic-port
+
+## Load Balancer Listeners
+
+### Listener: wordpress-host-header-rule
+
+- Protocol: HTTP
+- Condition: Host Header: wordpress.dext.local
+- Action: Forward to wordpress-target-group
+
+### Listener: wordpress-path-rule
+
+- Protocol: HTTP
+- Condition: Path Pattern: /wordpress/*
+- Action: Forward to wordpress-target-group
+
+## EFS File System
+
+### wordpress-efs
+
+- Creation Token: [Creation Token]
+- Lifecycle Policy: [Lifecycle Policy]
+
+## EFS Mount Targets
+
+- Subnets: [Subnet IDs]
+
+## EFS Security Group
+
+- Inbound Rule: Port 2049 (NFS) from Default Security Group
+
+## SSH Private Key
+
+### wordpress-key.pem
+
+- File Location: ../ansible/wordpress-key.pem
+- Permissions: 0600
 
 License
 

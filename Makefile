@@ -1,5 +1,6 @@
 TF_DIR := terraform
 ANSIBLE_DIR := ansible
+MAX_RETRIES := 3
 
 # Set AWS profile
 AWS_PROFILE := dext
@@ -15,7 +16,16 @@ plan:
 	cd $(TF_DIR) && terraform plan
 
 apply:
-	cd $(TF_DIR) && terraform apply -auto-approve
+    @cd $(TF_DIR) && \
+    retries=0; \
+    while [ $$retries -lt $(MAX_RETRIES) ]; do \
+        terraform apply -auto-approve && exit 0; \
+        retries=$$(($$retries + 1)); \
+        echo "Retrying Terraform apply (Attempt $$retries of $(MAX_RETRIES))..."; \
+    done; \
+    echo "Terraform apply failed after $(MAX_RETRIES) attempts."; \
+    exit 1
+
 
 destroy:
 	cd $(TF_DIR) && terraform destroy -auto-approve
