@@ -6,25 +6,13 @@ variable "vpc_cidr_block" {
   default     = "10.0.0.0/16"
 }
 
-variable "private_subnet_cidr_block" {
-  description = "The CIDR block for the private subnet."
-  type        = string
-  default     = "10.0.1.0/24"
-}
-
 variable "instance_type" {
     type     = string
     default  = "t2.micro"
 }
 
-variable "alb_listener_port" {
+variable "http_port" {
   description = "The port on which the ALB should listen for incoming traffic."
-  type        = number
-  default     = 80
-}
-
-variable "alb_target_port" {
-  description = "The port to which the ALB should forward incoming traffic."
   type        = number
   default     = 80
 }
@@ -44,5 +32,5 @@ variable "ami_name_filter" {
 }
 
 variable "host_header" {
-  default = "wordpress.dext.local"
+  default = "wp.dext.local"
 }

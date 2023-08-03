@@ -11,8 +11,8 @@
     - vars/wordpress_vars.yml
     - vars/mysql_vars.yml
 
-#  roles:
-#    - wordpress
+  roles:
+    - wordpress
 
   tasks:
     - name: Download wp-cli

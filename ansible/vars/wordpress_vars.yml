@@ -1,22 +1,3 @@
-custom_title: "Linux namespaces"
-custom_body: |
-  Namespaces are a feature of the Linux kernel that partitions kernel resources such that one set of processes sees one set of resources while another set of processes sees a different set of resources. The feature works by having the same namespace for these resources in the various sets of processes, but those names referring to distinct resources. Examples of resource names that can exist in multiple spaces, so that the named resources are partitioned, are process IDs, hostnames, user IDs, file names, and some names associated with network access, and interprocess communication.
-
-  Namespaces are a fundamental aspect of containers on Linux.
-
-  The term "namespace" is often used for a type of namespace (e.g. process ID) as well for a particular space of names.
-
-wordpress_auth_keys:
-  AUTH_KEY: 'Gz>}~v1cQIZUguTn#i]#2vNLPr7%YycGc|pG~Gw#MVY>3*)aiHj?J+Mr*-#m)CnJ'
-  SECURE_AUTH_KEY: 'EjdrAM#-J6-:+TD[nwu]eO2dABSUI0qJ{4DRb%]/qt&Oa!FA>cVk NS%Y^p={}Fu'
-  LOGGED_IN_KEY: '}-4wC~xHhPi$-IDQe0%r<Q7,3g*]d-TW[.jaR!e1cN]|t#<i]Q*v_ub@9O+9ddA7'
-  NONCE_KEY: '}_8LYje%~1{R*.Q_g`/%%*|9Za%21usI0/|KbtK^fAZ{b>_mGBRKi_qJA.BBr1 6'
-  AUTH_SALT: 'R/P<,jQ3htR0LC;9UpZ?*)Q~(H~.qGgrk(~vz^_4CL(#1)`}L$RNCC<K^}?YUzJ0'
-  SECURE_AUTH_SALT: 'zf2yI Qze2 a44(40($R*f8uJ?`J!02=6G;r8J}f+#KPRxi76/K3ZzXgg(m8Oq@Q'
-  LOGGED_IN_SALT: 'E?;SO$}H?D{N%G5R#XiA|!y8qK:XG65vxMi||Vf=l$=#qG:nOF](&)^8PNEq/{]^'
-  NONCE_SALT: ')os+ :_vygzNsokKnd4|[-D~0oEI>P4R*hJ]e)`n^|?1w|xe-<-e^7@o<ea.@$ G'
-
-
 #PHP Settings
 php_modules: [ 'php', 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
 

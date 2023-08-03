@@ -18,7 +18,7 @@ module "vpc" {
   version = "5.1.1"
 
   name                 = "wordpress-vpc"
-  cidr                 = "10.0.0.0/16"
+  cidr                 = var.vpc_cidr_block
   azs                  = ["us-east-2a", "us-east-2b"]
   public_subnets       = ["10.0.101.0/24", "10.0.102.0/24"]
   enable_dns_hostnames = true
@@ -42,8 +42,8 @@ module "wordpress_ec2" {
   source   = "terraform-aws-modules/ec2-instance/aws"
   version  = "5.2.1"
   for_each = {
-    "wordpress-instance-1" = "10.0.101.10"
-    "wordpress-instance-2" = "10.0.102.11"
+    "wordpress-instance-1" = {}
+    "wordpress-instance-2" = {}
   }
 
   name                          = each.key
@@ -65,7 +65,7 @@ module "database_ec2" {
   version = "5.2.1"
 
   for_each = {
-    "database-instance" = "10.0.101.20"
+    "database-instance" = {}
   }
 
   name                          = each.key
@@ -99,7 +99,7 @@ module "alb" {
 
 resource "aws_lb_target_group" "wordpress_target_group" {
   name     = "wordpress-target-group"
-  port     = 80
+  port     = var.http_port
   protocol = "HTTP"
   vpc_id   = module.vpc.vpc_id
 
@@ -112,7 +112,7 @@ resource "aws_lb_target_group" "wordpress_target_group" {
 
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.alb.lb_arn
-  port              = 80
+  port              = var.http_port
   protocol          = "HTTP"
 
   default_action {
@@ -164,12 +164,12 @@ resource "aws_lb_target_group_attachment" "wordpress_attachment_instance_2" {
 }
 
 
-# ALB Security Group Rules
+# Security Group Rules
 
 resource "aws_security_group_rule" "alb_http_ingress" {
   type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
+  from_port                = var.http_port
+  to_port                  = var.http_port
   protocol                 = "tcp"
   security_group_id        = module.alb.security_group_id
   source_security_group_id = module.vpc.default_security_group_id
@@ -186,8 +186,8 @@ resource "aws_security_group_rule" "alb_http_egress" {
 
 resource "aws_security_group_rule" "ingress" {
   type              = "ingress"
-  from_port         = 80
-  to_port           = 80
+  from_port         = var.http_port
+  to_port           = var.http_port
   protocol          = "tcp"
   security_group_id = module.vpc.default_security_group_id
   cidr_blocks       = ["0.0.0.0/0"]
