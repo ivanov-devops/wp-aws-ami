@@ -12,7 +12,26 @@ Before running Terraform, ensure you have the following:
 
 3. Terraform: Install Terraform on your Linux machine. You can download the latest version from the official website [here](https://www.terraform.io/downloads.html) or use package managers like `apt` or `yum`.
 
-4. AWS Credentials: Configure your AWS credentials on your Linux machine by creating a shared credentials file. Open a terminal and run:
+4. Ansible
+## Linux (Red Hat/CentOS)
+
+On Red Hat-based systems like CentOS, you can use the following commands to install Ansible:
+
+```bash
+sudo yum install epel-release   # Install the EPEL repository (if not already installed)
+sudo yum install ansible
+```
+## macOS
+```
+pip3 install ansible
+```
+#### check with
+```
+ansible --version
+```
+
+
+5. AWS Credentials: Configure your AWS credentials on your Linux machine by creating a shared credentials file. Open a terminal and run:
 
    ```bash
    mkdir ~/.aws
@@ -21,7 +40,7 @@ Before running Terraform, ensure you have the following:
    echo "aws_access_key_id = YOUR_ACCESS_KEY" >> ~/.aws/credentials
    echo "aws_secret_access_key = YOUR_SECRET_KEY" >> ~/.aws/credentials
 
-
+5. Use Makefile
 
 LICENSE
 
