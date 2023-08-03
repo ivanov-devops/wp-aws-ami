@@ -65,9 +65,9 @@ Ansible is used to:
 - add custom page to the current default theme via wp cli
 
 update in `makefile` `AWS_PROFILE :=` with your aws AWS_PROFILE
-
+create in `s3` bucket for tfstate file and update `terraform/backend.tf`
 and just run
-`make provision`
+`make deploy`
 
 # Terraform Provisioned Resources
 
