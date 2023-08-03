@@ -33,17 +33,37 @@ ansible --version
 
 5. AWS Credentials: Configure your AWS credentials on your Linux machine by creating a shared credentials file. Open a terminal and run:
 
-   ```bash
+   ```
+   bash
    mkdir ~/.aws
    touch ~/.aws/credentials
    echo "[default]" >> ~/.aws/credentials
    echo "aws_access_key_id = YOUR_ACCESS_KEY" >> ~/.aws/credentials
    echo "aws_secret_access_key = YOUR_SECRET_KEY" >> ~/.aws/credentials
+   ```
 
 5. Use Makefile
 
-LICENSE
-
-Replace `https://github.com/your-username/terraform-aws-infrastructure.git` in the `git clone` command with the actual URL of your repository if it's hosted on a remote Git service.
-
 With the Makefile and README.md in place, developers using Linux can easily understand the purpose of the repository, its prerequisites, and how to use the provided make targets to create and destroy the WordPress infrastructure. The README.md file also provides instructions on how to set up the required dependencies and where to place the WordPress files for the Ansible playbook to use.
+
+6.  MIT License
+
+Copyright (c) 2023 Dimitar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
