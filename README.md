@@ -74,10 +74,8 @@ Ansible is used to:
 or just run
 `make provision`
 
-7.  MIT License
-
-Copyright (c) 2023 Dimitar
 
 License
 
-This project is licensed under the MIT License. Feel free to use, modify, and distribute the code following the terms of the license.
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). Feel free to use, modify, and distribute the code following the terms of the license.
+Copyright (c) 2023 Dimitar
