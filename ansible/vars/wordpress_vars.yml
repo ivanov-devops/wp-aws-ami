@@ -24,3 +24,4 @@ php_modules: [ 'php', 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlr
 http_host: "wp.dext.local"
 http_conf: "wp.dext.local.conf"
 http_port: "80"
+http_pass: "somethingunique"

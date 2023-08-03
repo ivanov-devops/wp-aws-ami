@@ -11,12 +11,18 @@
     - vars/wordpress_vars.yml
     - vars/mysql_vars.yml
 
+  roles:
+    - wordpress
+
   tasks:
     - name: Download wp-cli
       get_url:
         url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
         dest: /usr/local/bin/wp
         mode: '0755'
+
+    - name: Install WordPress using wp-cli
+      command: /usr/local/bin/wp core install --path="/var/www/html/{{ http_host }}/wordpress" --url="{{ http_host }}" --title="My WordPress Site" --admin_user="admin" --admin_password="{{ http_pass }}" --admin_email="admin@example.com" --allow-root
 
     - name: Copy custom-content.php to the remote server
       copy:
@@ -35,18 +41,19 @@
       command: /usr/local/bin/wp option update show_on_front "page"
       args:
         chdir: "/var/www/html/{{ http_host }}/wordpress"
-      ignore_errors: yes
+      register: set_front_page_result
+      changed_when: "'already' not in set_front_page_result.stdout"
 
     - name: Get the custom page ID
       set_fact:
-        custom_page_id: "{{ custom_page_create_result.stdout | regex_findall('\\d+') | first }}"
-      when: custom_page_create_result.stdout | regex_findall('\\d+') | length > 0
+        custom_page_id: "{{ custom_page_create_result.stdout_lines[-1] | regex_findall('\\d+') | first }}"
+      when: custom_page_create_result.stdout_lines | length > 0
 
     - name: Update the status of the custom page to publish
       command: /usr/local/bin/wp post update "{{ custom_page_id }}" --post_status=publish
       args:
         chdir: "/var/www/html/{{ http_host }}/wordpress"
-      ignore_errors: yes
+      when: custom_page_id is defined and custom_page_id != ""
 
     - name: Flush rewrite rules
       command: /usr/local/bin/wp rewrite flush
